@@ -4,5 +4,5 @@ module use /util/opt/hcc-modules/Common
 module load anaconda
 source activate dashing
 python /util/admin/dashing-storage/storage_probe.py
-conda deactivate dashing
+conda deactivate
 module unload anaconda
