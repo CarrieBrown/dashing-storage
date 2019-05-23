@@ -192,15 +192,18 @@ def main():
                     topUsers[line.split(' ')[0]] += int(line.split(' ')[1])
                 else:
                     topUsers[line.split(' ')[0]] = int(line.split(' ')[1])
-    topUsers25 = sorted(topUsers.items(), key=operator.itemgetter(1), reverse=True)[:25]
-    
+    topUsers25 = sorted(topUsers.items(), key=operator.itemgetter(1), reverse=True)[:25] 
     ## The real magic of sql begins
     dataToDash = []
     cur = rcfdb.cursor()
     for k,v in topUsers25:
         stmt = "select Department, Campus from Personal where LoginID = \"" + k + "\";"
         cur.execute(stmt)
-        result = cur.fetchall()[0]
+        result = cur.fetchall()        
+        if len(result)==0:
+            result = {"Department":None,"Campus":None}
+        else:
+            result = result[0]
         if result["Department"] == None:
             result["Department"] = ""
         if result["Campus"] == None:
