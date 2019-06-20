@@ -13,7 +13,7 @@ import pymysql as SQL
 import pymysql.cursors
 import operator
 
-MOUNT = "/lustre"
+MOUNT = "/work"
 CLUSTER = socket.gethostname().split(".")[1].capitalize()
 from math import log
 terabyte = 1073741824
@@ -94,7 +94,7 @@ def main():
     jobs_completed = len(stdout.split())
     path = '/common/swanson/.dashing/'
     files = ['crane_jobs.txt', 'rhino_jobs.txt']
-    filename = path + files[0]
+    filename = path + CLUSTER.lower() + "_jobs.txt"
     with open(filename, 'w') as file:
         file.write(str(jobs_completed))
     total_jobs = 0
