@@ -6,7 +6,7 @@ import os
 import time
 import sys
 import socket
-import urllib2
+import urllib.request
 import json
 import re
 import pymysql as SQL
@@ -18,7 +18,21 @@ CLUSTER = socket.gethostname().split(".")[1].capitalize()
 from math import log
 terabyte = 1073741824
 
-unit_list = zip(['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 1, 1, 1])
+# unit_list = zip(['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 1, 1, 1])
+# def sizeof_fmt(num):
+#     """Human friendly file size"""
+#     if num > 1:
+#         exponent = min(int(log(num, 1024)), len(unit_list) - 1)
+#         quotient = float(num) / 1024**exponent
+#         unit, num_decimals = unit_list[exponent + 1]
+#         format_string = '%%.%sf%s' % (num_decimals, unit)
+#         format_string = format_string % (quotient)
+#         return format_string
+#     if num == 0:
+#         return '0 bytes'
+#     if num == 1:
+#         return '1 byte'
+unit_list = list(zip(['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 1, 1, 1]))
 def sizeof_fmt(num):
     """Human friendly file size"""
     if num > 1:
@@ -39,7 +53,7 @@ def main():
 
     p = subprocess.Popen(["df", "-P", MOUNT], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdoutdata, stderrdata) = p.communicate()
-    for line in stdoutdata.split("\n"):
+    for line in stdoutdata.decode("utf8").split("\n"):
         split_line = line.split()
         if len(split_line) < 5:
             continue
@@ -56,7 +70,7 @@ def main():
     (stdout, stderr) = p.communicate()
     sum_running_cores = 0
     per_user_cores = {}
-    for line in stdout.split("\n"):
+    for line in stdout.decode("utf-8").split("\n"):
         if line == "":
             break
         try:
@@ -126,7 +140,7 @@ def main():
         filename = path + filename
         if os.path.isfile(filename) and os.access(filename, os.R_OK):
             with open(filename, 'r') as file:
-                total_hours += int(file.read())
+                total_hours += int(float(file.read()))
         else:
             print("Error reading from " + filename)
 
@@ -137,7 +151,7 @@ def main():
     # Send Anvil Information
     ## Time Delay is to allow dashing to keep up with POST
     
-    f = urllib2.urlopen("http://anvil-beta.unl.edu:8123/")
+    f = urllib.request.urlopen("http://anvil-beta.unl.edu:8123/")
     rawData = json.load(f)
     dash.SendEvent('AnvilTile', {'current_vm': rawData["vm_count"]})
     time.sleep(1)
@@ -150,7 +164,7 @@ def main():
     dash.SendEvent('AnvilTile', {'current_disk': str(round(int(rawData["disk_gb"])/1024.0,2))})
 
     # Red Storage
-    redT2 = urllib2.urlopen("http://t2.unl.edu:8088/dfshealth.jsp")
+    redT2 = urllib.request.urlopen("http://t2.unl.edu:8088/dfshealth.jsp")
     redData = re.findall("\d+\.\d+",str(redT2.read()))
     dash.SendEvent('RedStorage', {'min': 0, 'max': float(redData[9])*1024, 'value': float(redData[10])*1024, 'Capacity': redData[9] + " PB"})  
     dash.SendEvent('HCCAmazonPrice', {'redStorage':float(redData[10])*1024})  
@@ -175,7 +189,7 @@ def main():
     p = subprocess.Popen(command,shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdout, stderr) = p.communicate()
     file = open(path + CLUSTER.lower()+'_users.txt', 'w')
-    file.write(stdout)
+    file.write(stdout.decode("utf-8"))
     file.close()
     
     
