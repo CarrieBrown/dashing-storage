@@ -13,25 +13,16 @@ import pymysql as SQL
 import pymysql.cursors
 import operator
 
-MOUNT = "/lustre"
+#Mount points for the work filesystem. Use df -P for confirmation, must be the same as "Mounted On" column
+mounts = {
+    "crane":"/lustre",
+    "rhino":"/work"
+}
 CLUSTER = socket.gethostname().split(".")[1].capitalize()
+MOUNT = mounts[CLUSTER.lower()]
 from math import log
 terabyte = 1073741824
 
-# unit_list = zip(['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 1, 1, 1])
-# def sizeof_fmt(num):
-#     """Human friendly file size"""
-#     if num > 1:
-#         exponent = min(int(log(num, 1024)), len(unit_list) - 1)
-#         quotient = float(num) / 1024**exponent
-#         unit, num_decimals = unit_list[exponent + 1]
-#         format_string = '%%.%sf%s' % (num_decimals, unit)
-#         format_string = format_string % (quotient)
-#         return format_string
-#     if num == 0:
-#         return '0 bytes'
-#     if num == 1:
-#         return '1 byte'
 unit_list = list(zip(['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 1, 1, 1]))
 def sizeof_fmt(num):
     """Human friendly file size"""
@@ -108,7 +99,7 @@ def main():
     jobs_completed = len(stdout.split())
     path = '/common/swanson/.dashing/'
     files = ['crane_jobs.txt', 'rhino_jobs.txt']
-    filename = path + files[0]
+    filename = path + CLUSTER.lower() + '_jobs.txt'
     with open(filename, 'w') as file:
         file.write(str(jobs_completed))
     total_jobs = 0
@@ -132,7 +123,7 @@ def main():
     stdout = map(int, stdout.split())
     hours_completed = sum(stdout)/3600
     files = ['crane_hours.txt', 'rhino_hours.txt']
-    filename = path + files[0]
+    filename = path + CLUSTER.lower() + '_hours.txt'
     with open(path + CLUSTER.lower()+'_hours.txt', 'w') as file:
         file.write(str(hours_completed))
     total_hours = 0
