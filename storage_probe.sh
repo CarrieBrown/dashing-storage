@@ -7,3 +7,4 @@ cd /util/admin/dashing-storage
 python /util/admin/dashing-storage/storage_probe.py
 conda deactivate
 module unload anaconda
+
