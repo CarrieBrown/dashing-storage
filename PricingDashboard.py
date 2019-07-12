@@ -42,7 +42,7 @@ dash = dashing.DashingImport('viz.unl.edu', auth_token = auth_key)
 #Storage: per GB Hour // 0.10 per GB/Month
 #Network: per GB
 prices = {
-"AWS_CPU" : 0.1664/4,
+"AWS_CPU" : 0.1920/4,
 "AWS_MEM" : 0,
 "AWS_STOR" : 0.0000616438,
 "AWS_NET" : 0.01,
@@ -50,15 +50,15 @@ prices = {
 "GCP_MEM" : 0.004237,
 "GCP_STOR" : 0.00005479452,
 "GCP_NET" : 0.08/1024,
-"AZ_CPU" : 0.06,
+"AZ_CPU" : 0.06975,
 "AZ_MEM" : 0,
 "AZ_STOR" : (1.54/32)/730,
 "AZ_NET" : 0.0865722,
-"DO_CPU" :  0.0119,
+"DO_CPU" :  0.04475,
 "DO_MEM" : 0,
 "DO_STOR" : 0.000136986,
 "DO_NET": 0.01,
-"IBM_CPU" :  0.0173,
+"IBM_CPU" :  0.05225,
 "IBM_MEM" : 0,
 "IBM_STOR" : 0.000035616,
 "IBM_NET" : 0.09
@@ -81,7 +81,8 @@ def getPricingData(timeDelta, SQLItems):
     ### Handle Authentication with database and dashing
     xdmoddb = SQL.connect(host=SQLItems["xdmodmysql_host"],user=SQLItems["xdmodmysql_username"],password=SQLItems["xdmodmysql_pass"],db=SQLItems["xdmodmysql_db"],cursorclass=pymysql.cursors.DictCursor)
     with open(sys.argv[2], 'r') as file:
-        auth_key = file.read().strip()   
+        auth_key = file.read().strip()
+    #dash = dashing.DashingImport('viz.unl.edu', auth_token = auth_key)   
     with xdmoddb:
         cur = xdmoddb.cursor()
         stmt = "SELECT cpu_time,start_time_ts, end_time_ts, mem_req   FROM jobfact WHERE start_time_ts > "+timeDelta+";"
